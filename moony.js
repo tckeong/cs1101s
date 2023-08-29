@@ -1,4 +1,4 @@
-import {ribbon, circle, beside, blank, stack, square, heart, show, beside_frac,
+import {ribbon, circle, beside, blank, stack, square, show, beside_frac,
     stack_frac} from "rune";
 /*
 function moony_1(rune) {
