@@ -53,19 +53,16 @@ function makeup_amount(x, coins) {
 
         // Combinations that do not use the head coin 
         // for the remaining amount.
-        // it is a list(list(...), list(...))
-        const combi_B = map(xs => append(head(coins), xs), 
-                            makeup_amount(x - head(coins), tail(coins)));
+        const combi_B = makeup_amount(x - head(coins), tail(coins));
 
         // Combinations that use the head coin.
-        const combi_C = map(xs => append(head(coins), xs), 
-                            makeup_amount(x - head(coins), coins));
+        const combi_C = map(x => pair(head(coins), x), combi_B);
 
         return append(combi_A, combi_C);
     }
 }
 
-// makeup_amount(22, list(1, 10, 5, 20, 1, 5, 1, 50));
+makeup_amount(22, list(1, 10, 5, 20, 1, 5, 1, 50));
 // Result: list(list(20, 1, 1), list(10, 5, 1, 5, 1), list(1, 20, 1),
 //              list(1, 20, 1), list(1, 10, 5, 5, 1), 
 //              list(1, 10, 5, 1, 5))
