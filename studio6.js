@@ -36,14 +36,10 @@ function remove_duplicates(lst) {
 */
 
 function remove_duplicates(lst) {
-    
-    function helper(xs) {
-         return is_null(xs)
-                ? null
-                : pair(head(xs), helper(filter(x => x !== head(xs), tail(xs))));
-    }
-    
-    return helper(lst);
+    return is_null(lst)
+           ? null
+           : pair(head(lst), 
+                  remove_duplicates(filter(x => x !== head(lst), tail(lst))));
 }
 
 // my_map(x => x * 2, list(1,2,3));
