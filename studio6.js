@@ -7,7 +7,6 @@ function my_filter(pred, xs) {
 }
 
 my_map(x => x + 2, list(4,2,3,4));
-display_list(my_filter(x => x % 2 === 0, list(1,2,4,5,6)));
 
 /*
 function remove_duplicates(lst) {
@@ -38,13 +37,11 @@ function remove_duplicates(lst) {
     return is_null(lst)
            ? null
            : pair(head(lst), 
-                  remove_duplicates(filter(x => x !== head(lst), tail(lst))));
+                  remove_duplicates(filter(x => !equal(x, head(lst)), tail(lst))));
 }
 
-// my_map(x => x * 2, list(1,2,3));
 remove_duplicates(list(1, 2, 3, 4, 4, 3, 2, 1, 2));
 
-/*
 function makeup_amount(x, coins) {
     if (x === 0) {
         return list(null);
@@ -68,8 +65,7 @@ function makeup_amount(x, coins) {
     }
 }
 
-makeup_amount(22, list(1, 10, 5, 20, 1, 5, 1, 50));
+// makeup_amount(22, list(1, 10, 5, 20, 1, 5, 1, 50));
 // Result: list(list(20, 1, 1), list(10, 5, 1, 5, 1), list(1, 20, 1),
 //              list(1, 20, 1), list(1, 10, 5, 5, 1), 
 //              list(1, 10, 5, 1, 5))
-*/
