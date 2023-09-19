@@ -1,4 +1,3 @@
-/*
 function my_map(f, xs) {
     return accumulate((x,y) => pair(f(x), y), null, xs);
 }
@@ -9,7 +8,7 @@ function my_filter(pred, xs) {
 
 my_map(x => x + 2, list(4,2,3,4));
 display_list(my_filter(x => x % 2 === 0, list(1,2,4,5,6)));
-*/
+
 /*
 function remove_duplicates(lst) {
     
