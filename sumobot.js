@@ -3,7 +3,7 @@
 // Constants
 const SPEED = 500;
 const VIBRATESPEED = 1000;
-const DETECTRAD = 30;
+const DETECTRAD = 40;
 
 // Motors
 const vibrator = ev3_motorB();
@@ -11,7 +11,7 @@ const leftwheel = ev3_motorA();
 const rightwheel = ev3_motorD();
 
 // Sensors
-const gyroSensor = ev3_gyroSensor();
+const gyroSensor = ev3_gyroSensor();    
 const ultraSensor = ev3_ultrasonicSensor();
 const colorSensor = ev3_colorSensor();
 
@@ -20,36 +20,58 @@ const COLORS = [undefined,"red","yellow","green","cyan","blue","magenta"];
 
 // Variables
 let prev_color = 0;
+let previous_color = 0;
 let angle = 0;
-let desired_turn_angle = 0;
-let initial_angle = 0;
+let firstrun = true;
+let atCenter = false;
+
+function colorCalibrator(){
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let time = 0;
+    function getColor() {
+        r = r + ev3_colorSensorRed(colorSensor);
+        g = g + ev3_colorSensorGreen(colorSensor);
+        b = b + ev3_colorSensorBlue(colorSensor);
+    }
+    
+    for (let i = 0; i< 100; i = i +1) {
+        getColor();
+        ev3_pause(50);
+        time = time + 1;
+    }
+    display(r / time);
+    display(g / time);
+    display(b / time);
+}
 
 function Main(){
     Setup();
+    prev_color = GetColor();
+    
+    /*
     while(true){
-        
-        
-        // SpinUntilFoundEnemy();
-        // Rush();
-    }
+        display(GetColor());
+        ev3_pause(1000);
+    }*/
     // SpinUntilFoundEnemy();
     // Rush();
-    // while(true){
-        
-        // display(GetDistance());
-        // ev3_pause(1000);
-        
-        // // if detected enemy, then rush
-        // if(IsEnemyInfront()) {
-        //     Rush();
-        // } else {
-        //     // if cannot detect enemy, then move toward center
-        //     MoveTowardCenter();
-        // //     // when reached center, spin until found enemy
-        //     SpinUntilFoundEnemy();
-        //     // if meet enemy, then rush
-        //     Rush();
-        // }
+    while(true){
+        // if detected enemy, then rush
+        if(IsEnemyInfront()) {
+            Rush();
+        } 
+        // if cannot detect enemy, then move toward center
+        if(GetColor() >= 5){
+            SpinUntilFoundEnemy();
+        }else {
+            if (MoveTowardCenter() === 0){
+                Rush();
+            }
+        }
+    
+    }
 }
 
 
@@ -69,7 +91,7 @@ function Setup() {
     ev3_motorSetStopAction(rightwheel, "brake");
     
     // Start vibrator
-    ev3_motorStart(vibrator);
+    // ev3_motorStart(vibrator);
 }
 
 function SetMotorDefaultSpeed(){
@@ -85,21 +107,63 @@ function Move(distance){// distance in cm
 }
 
 function MoveTowardCenter(){
-    let curr_color = GetColor();
-    
-    while(prev_color > 5) {
-        Turn(30);
-        if(IsMovingTowardCenter()) {
-            Move(20);
-        }
-        GetColor();
-        
-        // Check enemy
+    let color = 0;
+    let shouldrush = 1;
+    if(GetColor() <= 5) {
+        MotorStart();
+        prev_color = GetColor();
         if(IsEnemyInfront()) {
             Rush();
-            break;
         }
+        
+        // at center
+        if(color === 1){
+            ev3_motorSetSpeed(leftwheel, SPEED);
+            ev3_motorSetSpeed(rightwheel, -SPEED);
+            MotorStart();
+            while(GetColor()<=prev_color){
+                if (IsEnemyInfront()){
+                    shouldrush = 0;
+                    break;
+                }
+            }
+            SetMotorDefaultSpeed();
+            atCenter = false;
+        }else if(color === 6){
+            atCenter = true;
+            return 0;
+        }else {
+            ev3_motorSetSpeed(leftwheel, SPEED);
+            ev3_motorSetSpeed(rightwheel, -SPEED);
+            MotorStart();
+            while(true){
+                color = GetColor();
+                if (IsEnemyInfront()){
+                    shouldrush = 0;
+                    break;
+                }
+                // Green
+                if(color>prev_color){
+                    Turn(60);
+                    Move(30);
+                    break;
+                }
+                if(color<=prev_color-2){
+                    Turn(180);
+                    break;
+                }
+                if(color < prev_color){
+                    ev3_motorSetSpeed(leftwheel, SPEED);
+                    ev3_motorSetSpeed(rightwheel, -SPEED);
+                }
+                
+            }
+            SetMotorDefaultSpeed();
+        } 
+        // Check enemy
+        
     }
+    return shouldrush;
     
 }
 
@@ -114,7 +178,6 @@ function Turn(angle){
         
         // Check enemy
         if(IsEnemyInfront()) {
-            Rush();
             break;
         }
     }
@@ -126,34 +189,45 @@ function SpinUntilFoundEnemy(){
     ev3_motorSetSpeed(leftwheel, SPEED);
     ev3_motorSetSpeed(rightwheel, -SPEED);
     MotorStart();
-    while(!IsEnemyInfront()){
+    while(!IsEnemyInfront()&&!(GetColor()<=3)){
         display("Not found");
     }
-    MotorStop();
+    Rush();
     SetMotorDefaultSpeed();
 }
 
-// red 5 115, 22, 42
-// yellow 4
-// green 32,52,40
-// cyan 2
-// blue 30, 50, 67
-// magenta 5 74, 23, 64
-
+// red 44 11 14
+// yellow 53 42 17
+// green 10 18 14
+// cyan 17 34 49
+// blue 8 12 26
+// magenta 30 10 27
+const standardR = [undefined,178,256,46,72,34,128];
+const standardG = [undefined,32,199,80,153,47,31];
+const standardB = [undefined,66,77,58,200,111,107];
 // set prev color to current color
 function GetColor() {
     // TODO
-    const color_index = ev3_colorSensorGetColor();
-
-    // TODO mapping color_index 
-    if(color_index === 2) {
-        // cyan
-    } else if(color_index === 4) {
-        // yellow
-    } else {
-         
+    const Red = ev3_colorSensorRed(colorSensor);
+    const Green = ev3_colorSensorGreen(colorSensor);
+    const Blue = ev3_colorSensorBlue(colorSensor);
+    
+    let minValue = 10000;
+    let possible_index = 0;
+    let delta = 0;
+    for(let i = 1; i < 7; i = i + 1 ){
+        delta = math_abs(Red - standardR[i]) + math_abs(Green - standardG[i]) + math_abs(Blue - standardB[i]);
+        if(delta < minValue){
+            minValue = delta;
+            possible_index = i;
+        }
     }
-    return color_index;
+    if(math_abs(previous_color-possible_index)>1 && !firstrun){
+        firstrun = false;
+        return previous_color;
+    }
+    previous_color = possible_index;
+    return possible_index;
 }
 
 
@@ -171,23 +245,30 @@ function IsCollide() {
 
 
 function IsEnemyInfront(){
-    return GetDistance() <= DETECTRAD;
+    if(GetDistance() <= DETECTRAD){
+        display("found!!");
+        return true;
+    }
+    return false;
 } 
 
 function AtEdge(){
     // if reached yellow or reached red space
-    return GetColor() === 2  GetColor() === 1; 
+    return GetColor() === 2 || GetColor() === 1; 
 }
 
 function Rush(){
     ev3_motorSetSpeed(leftwheel, SPEED);
     ev3_motorSetSpeed(rightwheel, SPEED);
-    while(IsCollide()  !AtEdge() ){
-        // display("Rushhh");
-        if(!IsEnemyInfront()&&!IsCollide()){
+    MotorStart();
+    while(IsEnemyInfront()){
+        if(GetColor() === 1){
+            Turn(180);
             break;
         }
-        MotorStart();
+        if(GetColor()<=2&&!IsCollide()){
+            break;
+        }
     }
     MotorStop();
     SetMotorDefaultSpeed();
@@ -216,9 +297,3 @@ function IsPushed() {
 
 
 Main();
-// display(ev3_gyroSensorAngle(gyroSensor));
-// turn(100);
-// display(ev3_gyroSensorAngle(gyroSensor));
-
-// ev3_motorStart(motor_d);
-// ev3_pause(10000);
