@@ -52,6 +52,12 @@ function turnToDefault(speed) {
     }
 }
 
+// red 5 115, 22, 42
+// yellow 4
+// green 32,52,40
+// cyan 2
+// blue 30, 50, 67
+// magenta 5 74, 23, 64
 function getColorDistance() {
     const index = ev3_colorSensorGetColor();
     
