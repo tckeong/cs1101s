@@ -1,89 +1,65 @@
-const motor_b = ev3_motorB();
-const motor_c = ev3_motorC();
-const servo_motor = ev3_motorD();
-const color_sensor = ev3_colorSensor();
-const ultrasonic_sensor = ev3_ultrasonicSensor();
-const gyro_sensor = ev3_gyroSensor();
-
-const second = x => x * 1000;
-const angle = ev3_gyroSensorAngle(gyro_sensor);
-
-function setup() {
-    ev3_connected(motor_b) ? display("motor_b connected") : display("motor_b disconnect");
-    ev3_connected(motor_c) ? display("motor_c connected") : display("motor_c disconnect");
-    ev3_connected(servo_motor) ? display("servo_motor connected") : display("servo_motor disconnect");
-    ev3_connected(color_sensor) ? display("color_sensor connected") : display("color_sensor disconnect");
-    ev3_connected(ultrasonic_sensor) ? display("ultrasonic_sensor connected") : display("ultrasonic_sensor disconnect");
-    ev3_connected(gyro_sensor) ? display("gyro_sensor connected") : display("gyro_sensor disconnect");
+function GetDistance(){
+    return math_floor(ev3_ultrasonicSensorDistance(ultraSensor)/10);
 }
 
-function walk(command, speed) {
-    if (command === "stop") {
-        ev3_motorStop(motor_b);
-        ev3_motorStop(motor_c);
-    } else {
-        ev3_motorSetSpeed(motor_b, speed);
-        ev3_motorSetSpeed(motor_c, speed);
-        
-        ev3_motorStart(motor_b);
-        ev3_motorStart(motor_c);
-    }
+function GetAngle() {
+    return ev3_gyroSensorAngle(gyroSensor);
 }
 
-function calc_angle() {
-    return math_abs(math_abs(angle) - math_abs(ev3_gyroSensorAngle(gyro_sensor)));
+function IsCollide() {
+    return GetDistance() <= 13;
 }
 
-function getDistance() {
-    return ev3_ultrasonicSensorDistance(ultrasonic_sensor)/10;
+
+function IsEnemyInfront(){
+    return GetDistance() <= DETECTRAD;
+} 
+
+function AtEdge(){
+    // if reached yellow or reached red space
+    return GetColor() === 2  GetColor() === 1; 
 }
 
-function turnToDefault(speed) {
-    walk("stop", 0);
-    ev3_motorSetSpeed(motor_b, speed);
-    ev3_motorSetSpeed(motor_c, -speed);
-    ev3_motorStart(motor_b);
-    ev3_motorStart(motor_c);
-    while(true) {
-        let cur_angle = calc_angle();
-        if(cur_angle % 360 >= 0 && cur_angle % 360 <= 10) {
+function Rush(){
+    ev3_motorSetSpeed(leftwheel, SPEED);
+    ev3_motorSetSpeed(rightwheel, SPEED);
+    while(IsCollide()  !AtEdge() ){
+        // display("Rushhh");
+        if(!IsEnemyInfront()&&!IsCollide()){
             break;
         }
+        MotorStart();
     }
+    MotorStop();
+    SetMotorDefaultSpeed();
 }
 
-// red 5 115, 22, 42
-// yellow 4
-// green 32,52,40
-// cyan 2
-// blue 30, 50, 67
-// magenta 5 74, 23, 64
-function getColorDistance() {
-    const index = ev3_colorSensorGetColor();
-    
-    if(index === 0) {
-        display("no color");
-    } else {
-        // blue
-        if(index === 2) {
-            
-        } else if(index === 3) {  // green 
-            
-        } else if (index === 4) {  // yellow 
-            
-        } else if (index === 5) {  // red
-            
-        } else if (index === 6) {  // white
-             
-        } else {
-            
-        }
+function MotorStop(){
+    ev3_motorStop(leftwheel);
+    ev3_motorStop(rightwheel);
+}
+
+function MotorStart(){
+    ev3_motorStart(leftwheel);
+    ev3_motorStart(rightwheel);
+}
+
+function IsPushed() {
+    // TODO
+    angle = GetAngle();
+    ev3_pause(1000);
+    angle = GetAngle() - angle;
+    if(!(angle >= 0 && angle <= 5)) {
+        return true;
     }
+    return false;
 }
 
-function main() {
-    
-}
 
-walk("walk", 500);
-ev3_pause(second(10));
+Main();
+// display(ev3_gyroSensorAngle(gyroSensor));
+// turn(100);
+// display(ev3_gyroSensorAngle(gyroSensor));
+
+// ev3_motorStart(motor_d);
+// ev3_pause(10000);
