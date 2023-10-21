@@ -21,7 +21,7 @@ const COLORS = [undefined,"red","yellow","green","cyan","blue","magenta"];
 // Variables
 let prev_color = 0;
 let previous_color = 0;
-let angle = 0;
+let direction = 1;
 let firstrun = true;
 let atCenter = false;
 
@@ -36,7 +36,7 @@ function colorCalibrator(){
         b = b + ev3_colorSensorBlue(colorSensor);
     }
     
-    for (let i = 0; i< 100; i = i +1) {
+    for (let i = 0; i < 100; i = i +1) {
         getColor();
         ev3_pause(50);
         time = time + 1;
@@ -136,7 +136,9 @@ function MoveTowardCenter(){
             ev3_motorSetSpeed(leftwheel, SPEED);
             ev3_motorSetSpeed(rightwheel, -SPEED);
             MotorStart();
-            while(true){
+            while(true){ 
+                ev3_motorSetSpeed(leftwheel, direction*SPEED);
+                ev3_motorSetSpeed(rightwheel, -direction*SPEED);
                 color = GetColor();
                 if (IsEnemyInfront()){
                     shouldrush = 0;
@@ -144,7 +146,7 @@ function MoveTowardCenter(){
                 }
                 // Green
                 if(color>prev_color){
-                    Turn(60);
+                    Turn(direction*60);
                     Move(30);
                     break;
                 }
@@ -153,8 +155,9 @@ function MoveTowardCenter(){
                     break;
                 }
                 if(color < prev_color){
-                    ev3_motorSetSpeed(leftwheel, SPEED);
-                    ev3_motorSetSpeed(rightwheel, -SPEED);
+                    direction = -1;
+                }else {
+                    direction = 1;
                 }
                 
             }
@@ -170,10 +173,10 @@ function MoveTowardCenter(){
 function Turn(angle){
     // clockwise positive
     const initial_angle = ev3_gyroSensorAngle(gyroSensor);
-    const direction = angle/math_abs(angle);
-    ev3_motorSetSpeed(leftwheel, SPEED*direction);
-    ev3_motorSetSpeed(rightwheel, -SPEED*direction);
-    while(math_abs(ev3_gyroSensorAngle(gyroSensor)-initial_angle)<math_abs(angle)-10*angle/90){
+    const direction = angle / math_abs(angle);
+    ev3_motorSetSpeed(leftwheel, SPEED * direction);
+    ev3_motorSetSpeed(rightwheel, - SPEED * direction);
+    while(math_abs(ev3_gyroSensorAngle(gyroSensor) - initial_angle) < math_abs(angle) - 10*angle/90){
         MotorStart();
         
         // Check enemy
@@ -189,25 +192,18 @@ function SpinUntilFoundEnemy(){
     ev3_motorSetSpeed(leftwheel, SPEED);
     ev3_motorSetSpeed(rightwheel, -SPEED);
     MotorStart();
-    while(!IsEnemyInfront()&&!(GetColor()<=3)){
+    while(!IsEnemyInfront() && !(GetColor() <= 3)){
         display("Not found");
     }
     Rush();
     SetMotorDefaultSpeed();
 }
 
-// red 44 11 14
-// yellow 53 42 17
-// green 10 18 14
-// cyan 17 34 49
-// blue 8 12 26
-// magenta 30 10 27
 const standardR = [undefined,178,256,46,72,34,128];
 const standardG = [undefined,32,199,80,153,47,31];
 const standardB = [undefined,66,77,58,200,111,107];
 // set prev color to current color
 function GetColor() {
-    // TODO
     const Red = ev3_colorSensorRed(colorSensor);
     const Green = ev3_colorSensorGreen(colorSensor);
     const Blue = ev3_colorSensorBlue(colorSensor);
@@ -222,7 +218,7 @@ function GetColor() {
             possible_index = i;
         }
     }
-    if(math_abs(previous_color-possible_index)>1 && !firstrun){
+    if(math_abs(previous_color-possible_index) > 1 && !firstrun){
         firstrun = false;
         return previous_color;
     }
@@ -260,16 +256,18 @@ function AtEdge(){
 function Rush(){
     ev3_motorSetSpeed(leftwheel, SPEED);
     ev3_motorSetSpeed(rightwheel, SPEED);
+    ev3_motorStart(vibrator);
     MotorStart();
     while(IsEnemyInfront()){
         if(GetColor() === 1){
             Turn(180);
             break;
         }
-        if(GetColor()<=2&&!IsCollide()){
+        if(GetColor() <= 2 && !IsCollide()){
             break;
         }
     }
+    ev3_motorStop(vibrator);
     MotorStop();
     SetMotorDefaultSpeed();
 }
