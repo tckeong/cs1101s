@@ -56,4 +56,5 @@ function mcc(n, k) {
 }
 
 // mcc(365, 5);  // Expected result: 1730
-mcc(10000, 5);
+display(mcc(6000, 5));
+display(array_length(mem));
