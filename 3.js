@@ -1,5 +1,5 @@
 function zip_list_of_streams(streams) {
-    return pair(head(head(streams)), () => append(tail(streams), list(stream_tail(head(streams)))));
+    return pair(head(head(streams)), () => zip_list_of_streams(append(tail(streams), list(stream_tail(head(streams))))));
 }
 
 const x = zip_list_of_streams(list(enum_stream(0,5), enum_stream(3, 8)));
