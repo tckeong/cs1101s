@@ -24,8 +24,6 @@ function partial_sum(s) {
                 
 const x = partial_sum(enum_stream(1, 100));
 
-display(stream_ref(partial_sum(enum_stream(1, 100)), 2));
-                
-// for(let i = 0; i < 10; i = i + 1) {
-//     display(stream_ref(x, i));
-// }
+for(let i = 0; i < 10; i = i + 1) {
+    display(stream_ref(x, i));
+}
