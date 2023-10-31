@@ -6,10 +6,9 @@ function add_stream(s1, s2) {
     }
 }
 
-const alt_ones = pair(1, () => pair(-1 * head(alt_ones), alt_ones));
+const alt_ones = pair(1, () => pair(-1 * head(alt_ones), () => alt_ones));
 const zeros = add_stream(alt_ones, stream_tail(alt_ones));
-const ones = pair(1, () => ones);
 
 for(let i = 0; i < 10; i = i + 1) {
-    display(stream_ref(ones, i));
+    display(stream_ref(alt_ones, i));
 }
