@@ -617,6 +617,31 @@ function setup_environment() {
 const the_global_environment = setup_environment();
 const the_global_frame = head(the_global_environment);
 
+// the syntax predicate
+function is_logical_composition(component) {
+    return is_tagged_list(component, "logical_composition");
+}
+
+// selectors
+function logical_symbol(comp) {
+    return list_ref(comp, 1);
+}
+function logical_composition_first_component(comp) {
+    return list_ref(comp, 2);
+}
+function logical_composition_second_component(comp) {
+    return list_ref(comp, 3);
+}
+
+// helper to make a conditional expression
+function make_conditional_expression(pred, cons, alt) {
+    return list("conditional_expression", pred, cons, alt);
+}
+// helper to make a literal value
+function make_literal(value) {
+    return list("literal", value);
+}
+
 //
 // testing
 //
