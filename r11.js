@@ -54,6 +54,12 @@ function evaluate(program) {
                          conditional_consequent(command),
                          conditional_alternative(command)),
                     C));
+        } else if (is_logical_composition(command)) {
+            C = pair(make_conditional_expression(
+                    logical_composition_first_component(command),
+                    logical_composition_second_component(command),
+                    list("literal", false)), 
+                C);
         } else if (is_block(command)) {
             const locals = scan_out_declarations(
                              block_body(command));
@@ -637,11 +643,6 @@ function logical_composition_second_component(comp) {
 function make_conditional_expression(pred, cons, alt) {
     return list("conditional_expression", pred, cons, alt);
 }
-// helper to make a literal value
-function make_literal(value) {
-    return list("literal", value);
-}
-
 //
 // testing
 //
@@ -751,6 +752,5 @@ function factorial(n) {
 }
 factorial(5) + n;`);
 */
-
-
+display_list(parse_and_evaluate("false && 0();"));
 
