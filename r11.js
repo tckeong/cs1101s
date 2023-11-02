@@ -55,12 +55,21 @@ function evaluate(program) {
                          conditional_alternative(command)),
                     C));
         } else if (is_logical_composition(command)) {
-            // TODO!
-            C = pair(make_conditional_expression(
+            // &&
+            if(logical_symbol(command) === "&&") {
+                C = pair(make_conditional_expression(
                     logical_composition_first_component(command),
                     logical_composition_second_component(command),
-                    list("literal", false)), 
-                C);
+                    make_literal(false)), 
+                C);    
+            } else {
+                // ||
+                C = pair(make_conditional_expression(
+                    logical_composition_first_component(command),
+                    make_literal(true),
+                    logical_composition_second_component(command)), 
+                C);   
+            }
         } else if (is_block(command)) {
             const locals = scan_out_declarations(
                              block_body(command));
@@ -753,5 +762,5 @@ function factorial(n) {
 }
 factorial(5) + n;`);
 */
-display_list(parse_and_evaluate("false && 0();"));
+parse_and_evaluate("true || 0();");
 
