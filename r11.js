@@ -55,6 +55,7 @@ function evaluate(program) {
                          conditional_alternative(command)),
                     C));
         } else if (is_logical_composition(command)) {
+            // TODO!
             C = pair(make_conditional_expression(
                     logical_composition_first_component(command),
                     logical_composition_second_component(command),
