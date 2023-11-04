@@ -232,16 +232,17 @@ function shortest_path_length(maze, start_row, start_col) {
     const col = array_length(maze[0]);
     
     function helper(i, j, step) {
+        display(maze);
         if(i === row || j === col || i < 0 || j < 0) {
             return undefined;
         } else if(maze[i][j] === "G") {
+            display(maze[i][j]);
+            display(i, stringify(j));
             result = math_min(result, step);
             return undefined;
         } else if(maze[i][j] === "X" || maze[i][j] === "#") {
             return undefined;
         }
-        display(maze[i][j]);
-        display(i, stringify(j));
         
         maze[i][j] = "X";
         helper(i + 1, j, step + 1);
