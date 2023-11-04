@@ -262,4 +262,4 @@ const maze =
 [".", "#", ".", "."],
 [".", ".", ".", "#"]];
 
-shortest_path_length(maze, 0, 0); // returns 5
+shortest_path_length(maze, 3, 0); // returns 4
