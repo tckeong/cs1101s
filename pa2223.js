@@ -153,6 +153,27 @@
 //     }
 // }
 
+// function insert(x, xs) {
+//     return is_null(xs)
+//         ? list(x)
+//         : x <= head(xs)
+//         ? pair(x, xs)
+//         : pair(head(xs), insert(x, tail(xs)));
+// }
+
+// function insertion_sort(xs) {
+//     return is_null(xs)
+//         ? xs
+//         : insert(head(xs), insertion_sort(tail(xs)));
+// }
+
+// function map_tree(fun, tree) {
+//     return map(sub_tree =>
+//             !is_list(sub_tree)
+//             ? fun(sub_tree)
+//             : map_tree(fun, sub_tree),
+//         tree);
+// }
 
 // function make_SToN(T) {
 //     let array = null;
