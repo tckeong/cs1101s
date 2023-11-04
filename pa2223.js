@@ -206,3 +206,59 @@
 //     return map(helper1, T);
 // }
 
+// In a R x C maze, every cell has (row, column)-coordinates,
+// where Row 0 is the northern-most row, Row R - 1 is
+// the southern-most, Column 0 is the western-most column, 
+// and Column C - 1 is the eastern-most.
+// In this task, you are to write a shortest_path_length function, which takes as 
+// arguments a maze , and a starting cell
+// location (start_row, start_col) , and returns the length of the 
+// shortest path from the starting cell, through the
+// maze, to the target/goal cell. The given starting cell is always 
+// an empty cell or a target/goal cell. If there is no path to
+// the target/goal cell from the starting cell, your function should 
+// return the value Infinity . Note that the robot can
+// move only in the north, south, east or west direction, and cannot 
+// move "diagonally".
+// Complete the given template to implement the shortest_path_length function. 
+// Your function is allowed to modify
+// the input maze during its computation, but must restore it to its original 
+// values before the end of the
+// computation.
+
+function shortest_path_length(maze, start_row, start_col) {
+    let result = Infinity;
+    const row = array_length(maze);
+    const col = array_length(maze[0]);
+    
+    function helper(i, j, step) {
+        if(i === row || j === col || i < 0 || j < 0) {
+            return undefined;
+        } else if(maze[i][j] === "G") {
+            result = math_min(result, step);
+            return undefined;
+        } else if(maze[i][j] === "X" || maze[i][j] === "#") {
+            return undefined;
+        }
+        display(maze[i][j]);
+        display(i, stringify(j));
+        
+        maze[i][j] = "X";
+        helper(i + 1, j, step + 1);
+        helper(i, j + 1, step + 1);
+        helper(i - 1, j, step + 1);
+        helper(i, j - 1, step + 1);
+    }
+    
+    helper(start_row, start_col, 0);
+    return result;
+}
+
+const maze =
+[[".", "#", ".", "#"],
+[".", "#", "#", "."],
+[".", ".", ".", "G"],
+[".", "#", ".", "."],
+[".", ".", ".", "#"]];
+
+shortest_path_length(maze, 0, 0); // returns 5
